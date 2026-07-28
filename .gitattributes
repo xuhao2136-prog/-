@@ -1,0 +1,17 @@
+* text=auto eol=lf
+
+*.md text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+
+*.doc binary
+*.docx binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bmp binary
+*.tif binary
+*.tiff binary
+*.webp binary
