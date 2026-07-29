@@ -22,12 +22,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Export a mobile-friendly HTML document from the Markdown files in docs/."
     )
-    parser.add_argument("input_dir", type=Path, help="Markdown 目录")
-    parser.add_argument("output_file", type=Path, help="输出 HTML 文件")
+    parser.add_argument("input_dir", type=Path, help="Input directory containing Markdown files")
+    parser.add_argument("output_file", type=Path, help="Output HTML file path")
     parser.add_argument(
         "--title",
         default="调脂活脉颗粒治疗高脂血症的中药新药研发与临床转化",
-        help="HTML 页面标题",
+        help="HTML page title",
     )
     return parser.parse_args()
 
@@ -232,7 +232,9 @@ def collect_sections(input_dir: Path) -> list[tuple[str, str, str]]:
         body = render_markdown(strip_leading_title(text, title), base_level=2)
         sections.append((section_id, title, body))
     if not sections:
-        raise SystemExit(f"未在 {input_dir} 下找到符合 [0-9][0-9]-*.md 格式的 Markdown 章节。")
+        raise SystemExit(
+            f"No Markdown sections matching [0-9][0-9]-*.md were found under {input_dir}."
+        )
     return sections
 
 
