@@ -13,7 +13,6 @@ ORDERED_LIST_RE = re.compile(r"^\s*\d+\.\s+(.+?)\s*$")
 UNORDERED_LIST_RE = re.compile(r"^\s*[-*]\s+(.+?)\s*$")
 TABLE_SEPARATOR_RE = re.compile(r"^\|\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$")
 BLOCKQUOTE_RE = re.compile(r"^\s*>\s?(.*)\s*$")
-COMMENT_RE = re.compile(r"^\s*<!--.*-->\s*$")
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 CODE_RE = re.compile(r"`([^`]+)`")
 STRONG_RE = re.compile(r"\*\*(.+?)\*\*")
@@ -39,7 +38,7 @@ def slugify(text: str) -> str:
 
 def render_inline(text: str) -> str:
     escaped = html.escape(text)
-    escaped = CODE_RE.sub(lambda m: f"<code>{html.escape(m.group(1))}</code>", escaped)
+    escaped = CODE_RE.sub(lambda m: f"<code>{m.group(1)}</code>", escaped)
     escaped = STRONG_RE.sub(r"<strong>\1</strong>", escaped)
     escaped = LINK_RE.sub(
         lambda m: f'<a href="{html.escape(m.group(2), quote=True)}">{m.group(1)}</a>',
@@ -76,6 +75,7 @@ def render_markdown(markdown_text: str, base_level: int = 2) -> str:
     blockquote: list[str] = []
     list_items: list[str] = []
     list_kind: str | None = None
+    in_comment_block = False
     index = 0
 
     def flush_paragraph() -> None:
@@ -107,6 +107,12 @@ def render_markdown(markdown_text: str, base_level: int = 2) -> str:
         line = lines[index].rstrip()
         stripped = line.strip()
 
+        if in_comment_block:
+            if "-->" in stripped:
+                in_comment_block = False
+            index += 1
+            continue
+
         if not stripped:
             flush_paragraph()
             flush_list()
@@ -114,10 +120,12 @@ def render_markdown(markdown_text: str, base_level: int = 2) -> str:
             index += 1
             continue
 
-        if COMMENT_RE.match(stripped):
+        if stripped.startswith("<!--"):
             flush_paragraph()
             flush_list()
             flush_blockquote()
+            if "-->" not in stripped:
+                in_comment_block = True
             index += 1
             continue
 
@@ -214,7 +222,7 @@ def collect_sections(input_dir: Path) -> list[tuple[str, str, str]]:
         body = render_markdown(strip_leading_title(text, title), base_level=2)
         sections.append((section_id, title, body))
     if not sections:
-        raise SystemExit(f"未在 {input_dir} 下找到可导出的 Markdown 章节。")
+        raise SystemExit(f"未在 {input_dir} 下找到符合 [0-9][0-9]-*.md 格式的 Markdown 章节。")
     return sections
 
 
