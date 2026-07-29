@@ -40,6 +40,7 @@
 ## 文档索引
 
 - [文档总索引](docs/README.md)
+- [手机查看版 HTML](docs/调脂活脉颗粒申报材料-手机版.html)
 - [封面与填报说明](docs/00-封面与填报说明.md)
 - [项目基本信息表](docs/01-项目基本信息表.md)
 - [国内外现状及趋势分析](docs/02-国内外现状及趋势分析.md)
@@ -52,6 +53,7 @@
 ## 使用与贡献说明
 
 - 建议优先在 `docs/` 下直接修改 Markdown 内容，以便保留可审阅的变更历史。
+- 如需生成适合手机直接打开的单文件 HTML，可运行 `python3 scripts/export_docs_html.py docs docs/调脂活脉颗粒申报材料-手机版.html`。
 - 原始申报材料请保存在 `docs/legacy/`，避免直接覆盖历史文件。
 - 研究数据、图片与参考资料请分别放入 `data/`、`figures/`、`refs/`。
 - 若新增 Word 文档，可优先使用 `scripts/doc_to_markdown.py` 提取文本后再人工校对。
