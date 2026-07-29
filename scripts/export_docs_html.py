@@ -337,7 +337,7 @@ def build_html(title: str, sections: list[tuple[str, str, str]]) -> str:
       width: 100%;
       border-collapse: collapse;
       min-width: 640px;
-      background: #fff;
+      background: var(--card);
     }}
     th, td {{
       border: 1px solid var(--line);
