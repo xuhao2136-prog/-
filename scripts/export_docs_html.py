@@ -33,7 +33,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def slugify(text: str) -> str:
-    slug = re.sub(r"[^\w\u4e00-\u9fff-]+", "-", text, flags=re.UNICODE)
+    slug = re.sub(r"[^\w\u4e00-\u9fff]+", "-", text, flags=re.UNICODE)
     slug = re.sub(r"-{2,}", "-", slug).strip("-").lower()
     return slug or "section"
 
