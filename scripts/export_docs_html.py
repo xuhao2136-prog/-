@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""将 docs 目录下的 Markdown 章节导出为适合手机直接打开的单文件 HTML。"""
+"""Export Markdown sections in docs/ to a single mobile-friendly HTML file."""
 
 from __future__ import annotations
 
@@ -19,7 +19,9 @@ STRONG_RE = re.compile(r"\*\*(.+?)\*\*")
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="导出手机可直接打开的 HTML 文档")
+    parser = argparse.ArgumentParser(
+        description="Export a mobile-friendly HTML document from the Markdown files in docs/."
+    )
     parser.add_argument("input_dir", type=Path, help="Markdown 目录")
     parser.add_argument("output_file", type=Path, help="输出 HTML 文件")
     parser.add_argument(
@@ -37,8 +39,16 @@ def slugify(text: str) -> str:
 
 
 def render_inline(text: str) -> str:
-    escaped = html.escape(text)
-    escaped = CODE_RE.sub(lambda m: f"<code>{m.group(1)}</code>", escaped)
+    code_spans: list[str] = []
+
+    def stash_code(match: re.Match[str]) -> str:
+        code_spans.append(match.group(1))
+        return f"__CODE_SPAN_{len(code_spans) - 1}__"
+
+    escaped = html.escape(CODE_RE.sub(stash_code, text))
+    for index, code in enumerate(code_spans):
+        placeholder = f"__CODE_SPAN_{index}__"
+        escaped = escaped.replace(placeholder, f"<code>{html.escape(code)}</code>")
     escaped = STRONG_RE.sub(r"<strong>\1</strong>", escaped)
     escaped = LINK_RE.sub(
         lambda m: f'<a href="{html.escape(m.group(2), quote=True)}">{m.group(1)}</a>',
